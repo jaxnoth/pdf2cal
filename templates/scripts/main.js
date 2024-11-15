@@ -20,49 +20,47 @@ document.addEventListener('DOMContentLoaded', function() {
         fileInput.files = files;
     }
 
-    document.querySelector('#uploadForm').addEventListener('submit', async function(e) {
+    document.getElementById('uploadForm').addEventListener('submit', async function(e) {
         e.preventDefault();
 
+        const fileInput = document.getElementById('pdf_file');
         const file = fileInput.files[0];
+        const status = document.getElementById('status');
+
         if (!file) {
-            status.textContent = 'Please select a file';
+            alert('Please select a file');
             return;
         }
 
-        status.textContent = 'Converting...';
+        try {
+            status.textContent = 'Converting...';
 
-        // Convert file to base64
-        const reader = new FileReader();
-        reader.onload = async function() {
-            const base64File = reader.result.split(',')[1];
+            // Create FormData
+            const formData = new FormData();
+            formData.append('file', file);
 
-            try {
-                const response = await fetch('/api/ConvertPDF', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ pdf_content: base64File })
-                });
+            const response = await fetch('/api/ConvertPDF', {
+                method: 'POST',
+                body: formData
+            });
 
-                if (response.ok) {
-                    const blob = await response.blob();
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'basketball_schedule.ics';
-                    document.body.appendChild(a);
-                    a.click();
-                    window.URL.revokeObjectURL(url);
-                    status.textContent = 'Conversion successful!';
-                } else {
-                    const error = await response.text();
-                    status.textContent = `Error: ${error}`;
-                }
-            } catch (error) {
-                status.textContent = `Error: ${error.message}`;
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-        };
-        reader.readAsDataURL(file);
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'schedule.ics';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+
+            status.textContent = 'Conversion successful!';
+        } catch (error) {
+            console.error('Error:', error);
+            status.textContent = `Error: ${error.message}`;
+        }
     });
 });
