@@ -1,0 +1,4 @@
+Flask==2.0.1
+pdfplumber==0.7.4
+ics==0.7
+gunicorn==20.1.0

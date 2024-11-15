@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF to ICS Converter</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>PDF Schedule to Calendar Converter</h1>
+        <form id="uploadForm" action="{{ url_for('convert') }}" method="post" enctype="multipart/form-data">
+            <div class="upload-area">
+                <input type="file" id="pdf_file" name="pdf_file" accept=".pdf" required>
+                <label for="pdf_file">Choose PDF file or drag and drop</label>
+            </div>
+            <button type="submit">Convert to ICS</button>
+        </form>
+        <div id="status"></div>
+    </div>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
